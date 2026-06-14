@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bangla-text-toolkit"
+version = "0.1.0"
+description = "Zero-dependency Python library for Bangla NLP text preprocessing"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Umme Abira Azmary", email = "abiraazmary22@gmail.com" }]
+keywords = ["bangla", "bengali", "nlp", "text-preprocessing", "unicode", "low-resource-nlp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: Bengali",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "ruff>=0.4"]
+
+[project.urls]
+Homepage = "https://github.com/Mouly22/bangla-text-toolkit"
+Repository = "https://github.com/Mouly22/bangla-text-toolkit"
+Issues = "https://github.com/Mouly22/bangla-text-toolkit/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["bangla_text_toolkit*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
