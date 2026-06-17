@@ -19,28 +19,28 @@ import unicodedata
 
 
 # Unicode constants
-_NBSP = " "  # Non-Breaking Space
-_IDEOSPC = "ã"  # Ideographic Space
+_NBSP = " "  # Non-Breaking Space
+_IDEOSPC = "　"  # Ideographic Space
 
 _ZERO_WIDTH = re.compile(
-    r"[â-ââª-â®â -â¤ï»¿Â­]"
+    r"[​-‏‪-‮⁠-⁤﻿­]"
 )
 
 # Bangla digits to ASCII and back
-_BANGLA_DIGIT_TABLE = str.maketrans("à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯", "0123456789")
-_ASCII_DIGIT_TABLE = str.maketrans("0123456789", "à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯")
+_BANGLA_DIGIT_TABLE = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+_ASCII_DIGIT_TABLE = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
 
 _PUNCT_MAP = str.maketrans({
-    "'": "'",   # LEFT SINGLE QUOTATION MARK
-    "'": "'",   # RIGHT SINGLE QUOTATION MARK
-    "â": '"',   # LEFT DOUBLE QUOTATION MARK
-    "â": '"',   # RIGHT DOUBLE QUOTATION MARK
-    "â": "-",   # EN DASH
-    "â": "-",   # EM DASH
-    "à¥°": "à¥¤",  # Devanagari abbreviation sign -> danda
+    "‘": "'",   # LEFT SINGLE QUOTATION MARK
+    "’": "'",   # RIGHT SINGLE QUOTATION MARK
+    "“": '"',   # LEFT DOUBLE QUOTATION MARK
+    "”": '"',   # RIGHT DOUBLE QUOTATION MARK
+    "–": "-",   # EN DASH
+    "—": "-",   # EM DASH
+    "॰": "।",  # Devanagari abbreviation sign -> danda
 })
 
-_HASANTA_SPACE = re.compile(r"à§\s")
+_HASANTA_SPACE = re.compile(r"্\s")
 
 
 class BanglaTextNormalizer:
@@ -61,8 +61,8 @@ class BanglaTextNormalizer:
     Examples
     --------
     >>> n = BanglaTextNormalizer()
-    >>> n.normalize("à¦à¦®à¦¿  à¦¬à¦¾à¦à¦²à¦¾à¦¯à¦¼  à¦à¦¾à¦¨ à¦à¦¾à¦à¥¤")
-    'à¦à¦®à¦¿ à¦¬à¦¾à¦à¦²à¦¾à¦¯à¦¼ à¦à¦¾à¦¨ à¦à¦¾à¦à¥¤'
+    >>> n.normalize("আমি  বাংলায়  গান গাই।")
+    'আমি বাংলায় গান গাই।'
     """
 
     def __init__(
