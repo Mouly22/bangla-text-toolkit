@@ -136,8 +136,9 @@ class TestTransform:
 
     def test_repeated_token_has_higher_tf(self, fitted):
         idx = fitted.vocabulary_["গান"]
-        single = fitted.transform([["গান"]])[0][idx]
-        double = fitted.transform([["গান", "গান"]])[0][idx]
+        # Use mixed docs: TF("গান") = 1/2 vs 2/3 — avoids equal-TF edge case
+        single = fitted.transform([["গান", "আমি"]])[0][idx]
+        double = fitted.transform([["গান", "গান", "আমি"]])[0][idx]
         assert double > single
 
     def test_non_present_token_is_zero(self, fitted):
