@@ -21,5 +21,6 @@ __license__ = "MIT"
 
 from .normalizer import BanglaTextNormalizer
 from .stemmer import BanglaStemmer
+from .vectorizer import BanglaVectorizer
 
-__all__ = ["BanglaTextNormalizer", "BanglaStemmer", "__version__"]
+__all__ = ["BanglaTextNormalizer", "BanglaStemmer", "BanglaVectorizer", "__version__"]
