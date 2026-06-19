@@ -129,7 +129,7 @@ class TestShortTokens:
         assert stemmer.stem("আ") == "আ"
 
     def test_two_char_unchanged(self, stemmer):
-        assert stemmer.stem("রা") == "র"
+        assert stemmer.stem("রা") == "রা"  # stripping "া" gives 1-char stem; blocked by min_stem_length
 
 
 # ---------------------------------------------------------------------------
