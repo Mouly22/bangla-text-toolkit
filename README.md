@@ -24,6 +24,7 @@ Built in public as a 12-week engineering roadmap. Each day adds one well-tested 
 | `stemmer.py` | `BanglaStemmer` | Suffix-stripping stemmer (plurals, case markers, tense suffixes) |
 | `vectorizer.py` | `BanglaVectorizer` | TF-IDF vectorizer for pre-tokenised Bangla text |
 | `keyword_extractor.py` | `BanglaKeywordExtractor` | Top-k keyword extraction per document using TF-IDF scores |
+| `sequence_labeler.py` | `BanglaSequenceLabeler` | Rule-based token labelling (NUM, PUNCT, STOP, WORD + custom rules) |
 
 ---
 
@@ -51,35 +52,29 @@ from bangla_text_toolkit import (
     BanglaStemmer,
     BanglaVectorizer,
     BanglaKeywordExtractor,
+    BanglaSequenceLabeler,
 )
 from bangla_text_toolkit.tokenizer import BanglaTokenizer
 
 # 1. Normalise
 normalizer = BanglaTextNormalizer()
 text = normalizer.normalize("আমি  বাংলায়  গান  গাই!")
-# -> "আমি বাংলায় গান গাই!"
 
 # 2. Tokenise
 tok = BanglaTokenizer()
 tokens = tok.tokenize(text)
 # -> ["আমি", "বাংলায়", "গান", "গাই"]
 
-# 3. Stem
-stemmer = BanglaStemmer()
-stems = stemmer.stem_tokens(tokens)
-# -> ["আমি", "বাংলা", "গান", "গা"]
+# 3. Label tokens
+labeler = BanglaSequenceLabeler()
+print(labeler.label(tokens))
+# -> [('আমি', 'STOP'), ('বাংলায়', 'STOP'), ('গান', 'WORD'), ('গাই', 'WORD')]
 
-# 4. Vectorise (TF-IDF)
+# 4. Extract keywords (TF-IDF)
 corpus = [tok.tokenize(t) for t in ["আমি বাংলায় গান গাই", "সে বাংলায় কথা বলে"]]
-vec = BanglaVectorizer()
-matrix = vec.fit_transform(corpus)
-print(vec.get_feature_names())
-
-# 5. Extract keywords
 kex = BanglaKeywordExtractor(top_k=3)
 for doc_kws in kex.fit_extract(corpus):
     print(doc_kws)
-# -> [('গাই', 0.57...), ('গান', 0.40...), ('আমি', 0.40...)]
 ```
 
 ---
@@ -91,7 +86,7 @@ for doc_kws in kex.fit_extract(corpus):
 ```python
 from bangla_text_toolkit import BanglaTextNormalizer
 
-n = BanglaTextNormalizer(digit_mode="ascii")   # or "bangla" / None
+n = BanglaTextNormalizer(digit_mode="ascii")
 n.normalize("আমি ০১২ বাংলা")  # -> "আমি 012 বাংলা"
 ```
 
@@ -118,7 +113,7 @@ result = pipe.run("  আমি বাংলা  ")
 ### BanglaTokenizer
 
 ```python
-from bangla_text_toolkit.tokenizer import BanglaTokenizer, get_stopwords, remove_stopwords
+from bangla_text_toolkit.tokenizer import BanglaTokenizer, remove_stopwords
 
 tok = BanglaTokenizer()
 tok.tokenize("আমি বাংলায় গান গাই।")
@@ -126,9 +121,6 @@ tok.tokenize("আমি বাংলায় গান গাই।")
 
 tok.sent_tokenize("আমি গান গাই। সে কথা বলে।")
 # -> ["আমি গান গাই।", "সে কথা বলে।"]
-
-tokens = tok.tokenize("আমি বাংলায় গান গাই")
-remove_stopwords(tokens)   # removes "আমি", "বাংলায়" etc.
 ```
 
 ### BanglaRomanizer
@@ -146,7 +138,7 @@ r.romanize("বাংলা")  # -> "bangla"
 from bangla_text_toolkit import BanglaStemmer
 
 s = BanglaStemmer(min_stem_length=2)
-s.stem("বাংলাদের")   # -> "বাংলা"  (strips genitive plural -দের)
+s.stem("বাংলাদের")   # -> "বাংলা"
 s.stem_tokens(["বাংলাদের", "গানগুলো"])  # -> ["বাংলা", "গান"]
 ```
 
@@ -157,8 +149,7 @@ from bangla_text_toolkit import BanglaVectorizer
 
 corpus = [["আমি", "বাংলা"], ["সে", "বাংলা", "বলে"]]
 vec = BanglaVectorizer(max_features=500, min_df=1, use_idf=True)
-matrix = vec.fit_transform(corpus)   # list[list[float]]
-vec.vocabulary_        # {"আমি": 0, "বাংলা": 1, ...}
+matrix = vec.fit_transform(corpus)
 vec.get_feature_names()
 ```
 
@@ -169,19 +160,26 @@ from bangla_text_toolkit import BanglaKeywordExtractor
 
 corpus = [["আমি", "বাংলায়", "গান", "গাই"], ["সে", "বাংলায়", "কথা", "বলে"]]
 kex = BanglaKeywordExtractor(top_k=3, min_df=1, smooth_idf=True)
-
-# Fit on corpus, extract keywords per doc
 kex.fit(corpus)
 kex.extract(corpus[0])
 # -> [('গাই', 0.57...), ('গান', 0.40...), ('আমি', 0.40...)]
+```
 
-# Convenience: fit + extract in one call
-kex.fit_extract(corpus)
-# -> [[('গাই', ...), ...], [('বলে', ...), ...]]
+### BanglaSequenceLabeler
 
-# Override top_k per call
-kex.extract(corpus[0], top_k=1)
-# -> [('গাই', 0.57...)]
+```python
+from bangla_text_toolkit import BanglaSequenceLabeler
+
+tokens = ["আমি", "১২৩", "বাংলায়", "গান", "গাই", "।"]
+labeler = BanglaSequenceLabeler()
+labeler.label(tokens)
+# -> [('আমি', 'STOP'), ('১২৩', 'NUM'), ('বাংলায়', 'STOP'),
+#     ('গান', 'WORD'), ('গাই', 'WORD'), ('।', 'PUNCT')]
+
+# Add a custom rule (highest priority)
+labeler.add_rule(r"[A-Za-z]+", "LATIN")
+labeler.label(["hello", "গান"])
+# -> [('hello', 'LATIN'), ('গান', 'WORD')]
 ```
 
 ---
@@ -190,7 +188,7 @@ kex.extract(corpus[0], top_k=1)
 
 ```bash
 pytest tests/ -v
-# 180 tests, 0 failures, 0 dependencies
+# 213 tests, 0 failures, 0 dependencies
 ```
 
 ---
@@ -209,7 +207,8 @@ pytest tests/ -v
 | 6 | `BanglaStemmer` + 35 tests | ✅ |
 | 7 | `BanglaVectorizer` (TF-IDF) + 30 tests | ✅ |
 | 8 | `BanglaKeywordExtractor` (top-k TF-IDF keywords) + 29 tests | ✅ |
-| 9–12 | Sequence labeler, embeddings, demo notebook, PyPI publish | 🔜 |
+| 9 | `BanglaSequenceLabeler` (rule-based token labelling) + 33 tests | ✅ |
+| 10–12 | Embeddings, demo notebook, PyPI publish | 🔜 |
 
 ---
 
