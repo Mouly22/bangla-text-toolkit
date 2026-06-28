@@ -204,7 +204,8 @@ pytest tests/ -v
 | 8 | `BanglaKeywordExtractor` (top-k TF-IDF keywords) + 29 tests | ✅ |
 | 9 | `BanglaSequenceLabeler` (rule-based token labelling) + 33 tests | ✅ |
 | 10 | `BanglaEmbedder` (character n-gram hashing embeddings) + 33 tests | ✅ |
-| 11–12 | Demo notebook, PyPI publish | 🔜 |
+| 11 | `notebooks/demo.ipynb` end-to-end demo (all 11 components) | ✅ |
+| 12 | PyPI publish | 🔜 |
 
 ---
 
