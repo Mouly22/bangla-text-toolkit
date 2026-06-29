@@ -4,6 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=flat-square)](https://pypi.org/project/bangla-text-toolkit/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Zero dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen)](pyproject.toml)
+[![PyPI](https://img.shields.io/pypi/v/bangla-text-toolkit?style=flat-square)](https://pypi.org/project/bangla-text-toolkit/)
 
 Zero-dependency Python library for Bangla (Bengali) NLP text preprocessing.
 
@@ -205,7 +206,7 @@ pytest tests/ -v
 | 9 | `BanglaSequenceLabeler` (rule-based token labelling) + 33 tests | ✅ |
 | 10 | `BanglaEmbedder` (character n-gram hashing embeddings) + 33 tests | ✅ |
 | 11 | `notebooks/demo.ipynb` end-to-end demo (all 11 components) | ✅ |
-| 12 | PyPI publish | 🔜 |
+| 12 | PyPI publish (`v0.1.0`) | ✅ |
 
 ---
 
